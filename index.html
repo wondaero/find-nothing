@@ -20,6 +20,7 @@
     .guide{margin: 0; padding: 0 10px;}
     .stage{font-size: 25px; margin-bottom: 10px;}
     .board{font-size: 50px; text-align: center;}
+    .board.result{font-size: 25px;}
 
     footer{
         position: fixed; bottom: 0; left: 0; right: 0; background: #eee; display: flex; align-items: center; justify-content: center;
@@ -31,6 +32,7 @@
         width: 70px; margin-right: 15px; display: flex; align-items: center; justify-content: center; box-sizing:border-box; padding: 15px 20px;
         font-weight: 900; background: #fff; margin-bottom: 15px; color: #000;
     }
+    .keypad > div:hover{background: gold;}
     .keypad > div:nth-child(3n){margin-right: 0;}
     .keypad > div:nth-child(n + 10){margin-bottom: 0;}
 
@@ -80,9 +82,7 @@
         const guide = qs('#guide');
         const keypad = qs('#keypad');
 
-        function shuffle(arr) {
-            return arr.sort(() => Math.random() - 0.5);
-        }
+        const shuffle = arr => arr.sort(() => Math.random() - 0.5);
         
         const game = new GuessEmpty();
 
@@ -91,34 +91,57 @@
 
             t.init = function(first){
                 if(first){
-                    t.isStart = false;
-                    // t.isGameOver = false;
-                    t.startTime;
                     guide.innerText = '시작버튼을 눌러주세요.';
-                    board.innerText = '';
-                    t.stage = 1;
-                    t.lastStage = 5;
                 }
+                t.isStart = false;
+                // t.isGameOver = false;
+                t.startTime;
+                board.innerText = '';
+                t.stage = 1;
+                t.lastStage = 5;
+                t.missCnt = 0;
+                board.classList.remove('result');
             }
             
             t.init(true);
 
             t.start = function(){
                 if(t.isStart == true) return;
+
+                t.init();
                 t.isStart = true;
                 t.startTime = new Date().getTime();
                 t.settingNum();
             }
             
-            t.gameOver = function(){
+            t.gameOver = function(fail){
+                t.isStart = false;
+                guide.innerText = 'GAME OVER';
+                board.classList.add('result');
+                
+                if(fail){
+                    board.innerHTML = '<span>그만 틀려...</span>';
+                    return;
+                }
+                
                 const endTime = new Date().getTime();
                 const dur = ((endTime - t.startTime) / 1000);
-                t.isStart = false;
+                const dur2 = dur + (t.missCnt ? 2**t.missCnt : 0);
                 // t.isGameOver = true;
-                alert(dur + '초');
+                board.innerHTML = '<span>' + dur2 + '초</span>';
+                if(t.missCnt){
+                    board.innerHTML += '<br/><span>miss: ' + t.missCnt + '회</span>';
+                }
             }
             
             t.submit = function(num){
+                if(!t.isStart){
+                    alert('시작버튼을 눌러주세요.');
+                    return;
+                }
+
+                
+
                 if(num == t.hiddenNum){
                     if(t.stage == t.lastStage){
                         t.gameOver();
@@ -127,7 +150,12 @@
                     t.stage++;
                     t.settingNum();
                 }else{
-
+                    if(t.missCnt == 10){
+                        t.gameOver(true);
+                        return;
+                    }
+                    
+                    t.missCnt++;
                     keypad.classList.add('wrong');
                     keypad.addEventListener('animationend', function(){
                         this.classList.remove('wrong');
