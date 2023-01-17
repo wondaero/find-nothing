@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="./assets/css/normalize.css">
+</head>
+<style>
+    html, body{background: #000; color: #fff;}
+    .wrapper{}
+    header{
+        display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; padding: 10px; background: lightPink;
+        margin-bottom: 10px;
+    }
+    .logo{margin: 0; padding: 0; font-size: 30px; color: #000;}
+    header button{border: 0; outline: 0; background: blue; color: #fff; padding: 10px 20px; border-radius: 5px;}
+
+    .guide{margin: 0; padding: 0 10px;}
+    .stage{font-size: 25px; margin-bottom: 10px;}
+    .board{font-size: 50px; text-align: center;}
+
+    footer{
+        position: fixed; bottom: 0; left: 0; right: 0; background: #eee; display: flex; align-items: center; justify-content: center;
+        box-sizing: border-box; padding: 10px;
+    }
+    
+    .keyboard{width: 240px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap;}
+    .keyboard > div{
+        width: 70px; margin-right: 15px; display: flex; align-items: center; justify-content: center; box-sizing:border-box; padding: 15px 20px;
+        font-weight: 900; background: #fff; margin-bottom: 15px; color: #000;
+    }
+    .keyboard > div:nth-child(3n){margin-right: 0;}
+    .keyboard > div:nth-child(n + 10){margin-bottom: 0;}
+</style>
+<body>
+    <div class="wrapper">
+        <header>
+            <h1 class="logo">허전하다</h1>
+            <div><button onclick="game.start();">시작</button></div>
+        </header>
+            <div id="guide" class="guide">시작버튼을 눌러주세요.</div>
+            <div id="board" class="board"></div>
+            <footer>
+                <div class="keyboard">
+                    <div onclick="game.submit(1);">1</div>
+                    <div onclick="game.submit(2);">2</div>
+                    <div onclick="game.submit(3);">3</div>
+                    <div onclick="game.submit(4);">4</div>
+                    <div onclick="game.submit(5);">5</div>
+                    <div onclick="game.submit(6);">6</div>
+                    <div onclick="game.submit(7);">7</div>
+                    <div onclick="game.submit(8);">8</div>
+                    <div onclick="game.submit(9);">9</div>
+                    <div>-</div>
+                    <div onclick="game.submit(0);">0</div>
+                    <div>-</div>
+                </div>
+                
+            </footer>
+    </div>
+
+    <script>
+        const qs = function(t){return document.querySelector(t);}
+        const qsa = function(t){return document.querySelectorAll(t);}
+        
+        function getRandomNum(mn, mx){return Math.floor(Math.random() * (mx - mn + 1)) + mn;};
+        const numArr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+        const board = qs('#board');
+        const guide = qs('#guide');
+
+        function shuffle(arr) {
+            return arr.sort(() => Math.random() - 0.5);
+        }
+        
+        const game = new GuessEmpty();
+
+        function GuessEmpty(){
+            const t = this;
+
+            t.init = function(first){
+                if(first){
+                    t.isStart = false;
+                    // t.isGameOver = false;
+                    t.startTime;
+                    guide.innerText = '시작버튼을 눌러주세요.';
+                    board.innerText = '';
+                    t.stage = 1;
+                    t.lastStage = 5;
+                }
+            }
+            
+            t.init(true);
+
+            t.start = function(){
+                if(t.isStart == true) return;
+                t.isStart = true;
+                t.startTime = new Date().getTime();
+                t.settingNum();
+            }
+            
+            t.gameOver = function(){
+                const endTime = new Date().getTime();
+                const dur = ((endTime - t.startTime) / 1000);
+                t.isStart = false;
+                // t.isGameOver = true;
+                alert(dur + '초');
+            }
+            
+            t.submit = function(num){
+                if(num == t.hiddenNum){
+                    if(t.stage == t.lastStage){
+                        t.gameOver();
+                        return;
+                    }
+                    t.stage++;
+                    t.settingNum();
+                }else{
+                }
+            }
+            
+            t.settingNum = function(){
+                t.rdmArr = shuffle(JSON.parse(JSON.stringify(numArr)));
+                t.hiddenNum = t.rdmArr.splice(-1, 1)[0];
+
+                guide.innerHTML = `<div class="stage">step.${t.stage}</div>
+                <div>0~9 중 없는 숫자는?</div>`;
+
+                board.innerHTML = t.rdmArr.join('');
+            }
+
+        }
+
+
+    </script>
+
+
+
+</body>
+</html>
