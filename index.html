@@ -20,6 +20,11 @@
     .guide{margin: 0; padding: 0 10px;}
     .stage{font-size: 25px; margin-bottom: 10px;}
     .board{font-size: 50px; text-align: center;}
+    .rdm-num{
+        background: linear-gradient(#fff, transparent);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
     .board.result{font-size: 25px;}
 
     footer{
@@ -140,8 +145,6 @@
                     return;
                 }
 
-                
-
                 if(num == t.hiddenNum){
                     if(t.stage == t.lastStage){
                         t.gameOver();
@@ -170,7 +173,7 @@
                 guide.innerHTML = `<div class="stage">step.${t.stage}</div>
                 <div>0~9 중 없는 숫자는?</div>`;
 
-                board.innerHTML = t.rdmArr.join('');
+                board.innerHTML = '<div class="rdm-num">' + t.rdmArr.join('') + '</div>';
             }
 
         }
